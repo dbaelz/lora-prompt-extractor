@@ -1,7 +1,8 @@
 import os
-import sys
 import json
 from PIL import Image
+
+from cli import parse_args
 
 def extract_positive_prompt_from_prompt_json(prompt_json):
     try:
@@ -18,15 +19,13 @@ def extract_positive_prompt_from_prompt_json(prompt_json):
     return None
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <image_folder> [word_to_remove]")
-        sys.exit(1)
-    image_folder = sys.argv[1]
-    word_to_remove = sys.argv[2] if len(sys.argv) > 2 else None
+    args = parse_args()
+    image_folder = args.image_folder
+    word_to_remove = args.word_to_remove
 
     if not os.path.isdir(image_folder):
         print(f"Error: '{image_folder}' is not a valid directory.")
-        sys.exit(1)
+        exit(1)
 
     import re
     for file in os.listdir(image_folder):
