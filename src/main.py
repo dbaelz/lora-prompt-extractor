@@ -21,7 +21,7 @@ def extract_positive_prompt_from_prompt_json(prompt_json):
 if __name__ == "__main__":
     args = parse_args()
     image_folder = args.image_folder
-    word_to_remove = args.word_to_remove
+    words_to_remove = args.words_to_remove
 
     if not os.path.isdir(image_folder):
         print(f"Error: '{image_folder}' is not a valid directory.")
@@ -37,11 +37,11 @@ if __name__ == "__main__":
             if prompt_json:
                 prompt = extract_positive_prompt_from_prompt_json(prompt_json)
                 if prompt:
-                    if word_to_remove:
-                        pattern = re.compile(rf'\b{re.escape(word_to_remove)}\b', re.IGNORECASE)
+                    for word in words_to_remove:
+                        pattern = re.compile(rf'\b{re.escape(word)}\b', re.IGNORECASE)
                         prompt = pattern.sub('', prompt)
-                        prompt = re.sub(r'\s*,\s*', ', ', prompt)
-                        prompt = re.sub(r'\s+', ' ', prompt).strip(' ,')
+                    prompt = re.sub(r'\s*,\s*', ', ', prompt)
+                    prompt = re.sub(r'\s+', ' ', prompt).strip(' ,')
                     prompt = prompt.strip()
                     txt_path = os.path.join(image_folder, os.path.splitext(file)[0] + ".txt")
                     with open(txt_path, "w", encoding="utf-8") as f:
