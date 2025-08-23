@@ -23,6 +23,12 @@ if __name__ == "__main__":
     image_folder = args.image_folder
     words_to_remove = args.words_to_remove
 
+    # Split each item on commas, strip whitespace, and flatten
+    phrases_to_remove = []
+    for item in words_to_remove:
+        phrases = [phrase.strip() for phrase in item.split(",") if phrase.strip()]
+        phrases_to_remove.extend(phrases)
+
     if not os.path.isdir(image_folder):
         print(f"Error: '{image_folder}' is not a valid directory.")
         exit(1)
@@ -37,8 +43,8 @@ if __name__ == "__main__":
             if prompt_json:
                 prompt = extract_positive_prompt_from_prompt_json(prompt_json)
                 if prompt:
-                    for word in words_to_remove:
-                        pattern = re.compile(rf'\b{re.escape(word)}\b', re.IGNORECASE)
+                    for phrase in phrases_to_remove:
+                        pattern = re.compile(re.escape(phrase), re.IGNORECASE)
                         prompt = pattern.sub('', prompt)
                     prompt = re.sub(r'\s*,\s*', ', ', prompt)
                     prompt = re.sub(r'\s+', ' ', prompt).strip(' ,')
