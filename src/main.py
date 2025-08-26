@@ -22,6 +22,19 @@ def extract_positive_prompt_from_prompt_json(prompt_json):
                 return pos_node["inputs"]["text"]
     return None
 
+def clean_prompt(prompt):
+    # Remove (tag:weight) or (tag)
+    prompt = re.sub(r'\(([^:()]+)(:[^()]+)?\)', r'\1', prompt)
+    # Remove [tag]
+    prompt = re.sub(r'\[([^\]]+)\]', r'\1', prompt)
+    # Remove {tag}
+    prompt = re.sub(r'\{([^}]+)\}', r'\1', prompt)
+    # Remove extra spaces and commas
+    prompt = re.sub(r'\s*,\s*', ', ', prompt)
+    prompt = re.sub(r'\s+', ' ', prompt)
+    prompt = prompt.strip(' ,')
+    return prompt.strip()
+
 if __name__ == "__main__":
     args = parse_args()
     image_folder = args.image_folder
@@ -51,9 +64,7 @@ if __name__ == "__main__":
                     for phrase in phrases_to_remove:
                         pattern = re.compile(re.escape(phrase), re.IGNORECASE)
                         prompt = pattern.sub('', prompt)
-                    prompt = re.sub(r'\s*,\s*', ', ', prompt)
-                    prompt = re.sub(r'\s+', ' ', prompt).strip(' ,')
-                    prompt = prompt.strip()
+                    prompt = clean_prompt(prompt)
                     txt_path = os.path.join(image_folder, os.path.splitext(file)[0] + ".txt")
                     with open(txt_path, "w", encoding="utf-8") as f:
                         f.write(prompt)
