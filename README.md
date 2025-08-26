@@ -11,6 +11,7 @@ Command line tool to extract the positive prompts from PNG images created with [
 - Creates .txt files for each image, ready for LoRA training with kohya_ss.
 - Supports removal of unwanted words or phrases from prompts (case-insensitive). Accepts multiple words or phrases to remove, either as separate arguments or as a comma-separated list.
 - Optionally exports a summary file (`summary.csv`) with all image filenames and the .txt file descriptions using the `--summary` or `-s` flag.
+- Debug mode (`--debug` or `-d`) prints the number of PNG files found, each image's metadata, and the final prompt written to file.
 
 ## Example usage
 Extract prompts from all PNG images in a folder:
@@ -38,7 +39,6 @@ python src/main.py /path/to/image_folder --summary
 ```
 
 The resulting .txt files (and optional summary.txt) will be created in the same folder as the images, with the specified words/phrases removed from each prompt.
-
 
 ## Contribution
 Feel free to contribute via pull requests.
