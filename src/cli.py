@@ -23,4 +23,9 @@ def parse_args():
         action="store_true",
         help="Export a summary.csv with the filenames and the .txt file descriptions"
     )
+    parser.add_argument(
+        "--debug", "-d",
+        action="store_true",
+        help="Print debug information for each image (img.info and final prompt)"
+    )
     return parser.parse_args()

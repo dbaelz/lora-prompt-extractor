@@ -40,6 +40,7 @@ if __name__ == "__main__":
     image_folder = args.image_folder
     words_to_remove = args.words_to_remove
     summary_flag = getattr(args, 'summary', False)
+    debug_flag = getattr(args, 'debug', False)
 
     # Split each item on commas, strip whitespace, and flatten
     phrases_to_remove = []
@@ -52,24 +53,31 @@ if __name__ == "__main__":
         exit(1)
     
     summary_entries = []
-    for file in os.listdir(image_folder):
-        if file.lower().endswith(".png"):
-            img_path = os.path.join(image_folder, file)
-            img = Image.open(img_path)
-            meta = img.info
-            prompt_json = meta.get("prompt")
-            if prompt_json:
-                prompt = extract_positive_prompt_from_prompt_json(prompt_json)
-                if prompt:
-                    for phrase in phrases_to_remove:
-                        pattern = re.compile(re.escape(phrase), re.IGNORECASE)
-                        prompt = pattern.sub('', prompt)
-                    prompt = clean_prompt(prompt)
-                    txt_path = os.path.join(image_folder, os.path.splitext(file)[0] + ".txt")
-                    with open(txt_path, "w", encoding="utf-8") as f:
-                        f.write(prompt)
-                    if summary_flag:
-                        summary_entries.append((file, prompt))
+    png_files = [file for file in os.listdir(image_folder) if file.lower().endswith(".png")]
+    if debug_flag:
+        print(f"[DEBUG] Found {len(png_files)} PNG files in '{image_folder}'")
+    for file in png_files:
+        img_path = os.path.join(image_folder, file)
+        img = Image.open(img_path)
+        meta = img.info
+        prompt_json = meta.get("prompt")
+        if prompt_json:
+            prompt = extract_positive_prompt_from_prompt_json(prompt_json)
+            if prompt:
+                for phrase in phrases_to_remove:
+                    pattern = re.compile(re.escape(phrase), re.IGNORECASE)
+                    prompt = pattern.sub('', prompt)
+                prompt = clean_prompt(prompt)
+                if debug_flag:
+                    print(f"\n[DEBUG] {file} img.info:")
+                    print(meta)
+                    print(f"[DEBUG] {file} prompt written to file:")
+                    print(prompt)
+                txt_path = os.path.join(image_folder, os.path.splitext(file)[0] + ".txt")
+                with open(txt_path, "w", encoding="utf-8") as f:
+                    f.write(prompt)
+                if summary_flag:
+                    summary_entries.append((file, prompt))
 
     if summary_flag and summary_entries:
         summary_path = os.path.join(image_folder, _SUMMARY_FILENAME)
