@@ -18,4 +18,9 @@ def parse_args():
         metavar="WORD",
         help="Words to remove from prompt (optional, space separated)"
     )
+    parser.add_argument(
+        "--summary", "-s",
+        action="store_true",
+        help="Export a summary.csv with the filenames and the .txt file descriptions"
+    )
     return parser.parse_args()

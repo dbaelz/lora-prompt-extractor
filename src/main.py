@@ -1,8 +1,12 @@
+import csv
 import os
 import json
+import re
 from PIL import Image
 
 from cli import parse_args
+
+_SUMMARY_FILENAME = "summary.csv"
 
 def extract_positive_prompt_from_prompt_json(prompt_json):
     try:
@@ -22,6 +26,7 @@ if __name__ == "__main__":
     args = parse_args()
     image_folder = args.image_folder
     words_to_remove = args.words_to_remove
+    summary_flag = getattr(args, 'summary', False)
 
     # Split each item on commas, strip whitespace, and flatten
     phrases_to_remove = []
@@ -32,8 +37,8 @@ if __name__ == "__main__":
     if not os.path.isdir(image_folder):
         print(f"Error: '{image_folder}' is not a valid directory.")
         exit(1)
-
-    import re
+    
+    summary_entries = []
     for file in os.listdir(image_folder):
         if file.lower().endswith(".png"):
             img_path = os.path.join(image_folder, file)
@@ -52,4 +57,16 @@ if __name__ == "__main__":
                     txt_path = os.path.join(image_folder, os.path.splitext(file)[0] + ".txt")
                     with open(txt_path, "w", encoding="utf-8") as f:
                         f.write(prompt)
+                    if summary_flag:
+                        summary_entries.append((file, prompt))
+
+    if summary_flag and summary_entries:
+        summary_path = os.path.join(image_folder, _SUMMARY_FILENAME)
+        with open(summary_path, "w", encoding="utf-8", newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["filename", "prompt"])
+            for entry in summary_entries:
+                writer.writerow(entry)
+        print(f"✅ Summary written to {summary_path}")
+
     print("✅ Positive prompts extracted to .txt files.")
