@@ -25,15 +25,26 @@ def extract_positive_prompt_from_prompt_json(prompt_json):
 def clean_prompt(prompt):
     # Remove (tag:weight) or (tag)
     prompt = re.sub(r'\(([^:()]+)(:[^()]+)?\)', r'\1', prompt)
+    
     # Remove [tag]
     prompt = re.sub(r'\[([^\]]+)\]', r'\1', prompt)
+
     # Remove {tag}
     prompt = re.sub(r'\{([^}]+)\}', r'\1', prompt)
+
     # Remove extra spaces and commas
     prompt = re.sub(r'\s*,\s*', ', ', prompt)
     prompt = re.sub(r'\s+', ' ', prompt)
     prompt = prompt.strip(' ,')
-    return prompt.strip()
+
+    # Deduplicate tags/phrases (split by comma, preserve order)
+    seen = set()
+    deduped = []
+    for tag in [t.strip() for t in prompt.split(',') if t.strip()]:
+        if tag not in seen:
+            seen.add(tag)
+            deduped.append(tag)
+    return ', '.join(deduped)
 
 if __name__ == "__main__":
     args = parse_args()
@@ -54,6 +65,9 @@ if __name__ == "__main__":
     
     summary_entries = []
     png_files = [file for file in os.listdir(image_folder) if file.lower().endswith(".png")]
+    if not png_files:
+        print(f"❎ No PNG images found in '{image_folder}'")
+        exit(0)
     if debug_flag:
         print(f"[DEBUG] Found {len(png_files)} PNG files in '{image_folder}'")
     for file in png_files:

@@ -7,6 +7,7 @@ Command line tool to extract the positive prompts from PNG images created with [
 	- Removes parentheses, brackets, and braces (e.g., (tag), [tag], {tag})
 	- Removes weights from prompts (e.g., (tag:1.5) to tag)
 	- Collapses extra spaces and commas
+	- Removes duplicated tags and phrases
 	- Trims leading/trailing punctuation and whitespace
 - Creates .txt files for each image, ready for LoRA training with kohya_ss.
 - Supports removal of unwanted words or phrases from prompts (case-insensitive). Accepts multiple words or phrases to remove, either as separate arguments or as a comma-separated list.
